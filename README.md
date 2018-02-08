@@ -1,6 +1,6 @@
 Swope Telescope Photometry
 ==========================
-[![Build Status](https://api.travis-ci.org/benvanwerkhoven/empty_python.svg?branch=master)](https://travis-ci.org/benvanwerkhoven/empty_python)
+[![Build Status](https://travis-ci.org/nickkonidaris/Swope-reduction.svg?branch=master)](https://travis-ci.org/nickkonidaris/Swope-reduction)
 
 
 
