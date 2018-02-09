@@ -3,3 +3,4 @@ doc/build/*
 *coverage*
 *.swp
 *ropeproject*
+*ipynb_checkpoints*
