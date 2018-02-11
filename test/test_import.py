@@ -1,4 +1,4 @@
-from .context import empty_python
+from .context import Swoper
 
 
 def test_empty():
