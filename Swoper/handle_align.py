@@ -13,24 +13,23 @@ if __name__ == '__main__':
 
     import sys
 
-    source = sys.argv[2]
-    rest = sys.argv[3:]
-    print("Mapping all to %s" % source)
+    source = sys.argv[1]
+    rest = sys.argv[2:]
+    print("Mapping %s to %s" % (source, rest))
 
     hdu = astropy.io.fits.open(source)
     dat = hdu[0].data
-    print(dat)
-
 
     for fname in rest:
-        print(fname)
         hdu = astropy.io.fits.open(fname)
         d2 = hdu[0].data
 
         new = aa.register(dat, d2)
 
         hdu = astropy.io.fits.PrimaryHDU(new)
-        hdu.writeto("reg_%s" % fname)
+        outname = "reg_%s" % fname
+        print("Writing to : %s" % outname)
+        hdu.writeto(outname)
 
 
 
