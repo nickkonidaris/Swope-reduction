@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Get current directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+/usr/local/bin/sex $1,$2 -c $DIR/../etc/config.sex
