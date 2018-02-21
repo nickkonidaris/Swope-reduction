@@ -4,3 +4,4 @@ doc/build/*
 *.swp
 *ropeproject*
 *ipynb_checkpoints*
+*.swo
