@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Get current directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+/usr/local/bin/sex $1,$2 -c $DIR/../etc/config.sex
+
+mv bsub.fits extractions/bsub_$2
+mv backrms.fits extractions/brms_$2
+mv osub.fits extractions/objs_$2
+mv segs.fits extractionssegs_$2
+mv output.cat extractions/$2.cat
+
+python $DIR/../Swoper/sextods9.py extractions/$2.cat > extractions/$2.reg
