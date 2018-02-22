@@ -54,8 +54,8 @@ def collect_set(ic, collect_by, trim="[2:2047,2:2055]",
                 bias={1: None, 2: None, 3: None, 4: None},
                 dark={1: None, 2: None, 3: None, 4: None},
                 flat={1: None, 2: None, 3: None, 4: None},
-                gain_corrected=False, dark_exposure_time=None, **kwargs
-                ):
+                gain_corrected=False, dark_exposure_time=None,
+                CRR=False, **kwargs):
     """ Organize an image collection to a dict of lists of CCD by amplifier.
 
     Searches through ic to find files that have keywords indicated by
@@ -104,6 +104,10 @@ def collect_set(ic, collect_by, trim="[2:2047,2:2055]",
             # TODO: Scale exposure times
         if flat[AMP] is not None:
             dat = ccdproc.flat_correct(dat, flat[AMP])
+        if CRR:
+            dat = ccdproc.cosmicray_lacosmic(dat, sigclip=5, psffwhm=3.2)
+
+
 
         peramp[AMP].append(dat)
 
@@ -173,6 +177,7 @@ def write_collection(collection, outdir="OUT/", name="out"):
         print("To path %s" % outdir)
         mkdir_nowarn(outdir)
 
+
         for image in images:
             fname = "%s/%s_proc.fits" % (outdir, image.header["filename"])
             print("To: %s" % fname)
@@ -200,7 +205,10 @@ if __name__ == '__main__':
     parser.add_argument("--exclude", default=None, help="glob to exclude")
     parser.add_argument("--path", default=".", help="glob to exclude")
     parser.add_argument("--verbose", default=False, help="glob to exclude")
-    parser.add_argument("--science", default=False, help="do science frames")
+    parser.add_argument("--flatname", default="Quartz dome flat - 900 V",
+                        help="Fits header object name for flats")
+    parser.add_argument("--CRR", default=False, help="reject cosmic rays",
+                        action="store_true")
     parser.add_argument("--dark_exptime", default=150.0,
                         help="Dark exposure time in second")
 
@@ -231,7 +239,7 @@ if __name__ == '__main__':
 
     for filter_ in set(ic.values("filter")):
         predicate = {"EXPTYPE": "Flat", "FILTER": filter_, "BINNING": "1x1",
-                     "OBJECT": "Quartz dome flat - 900 V"}
+                     "OBJECT": args.flatname}
 
         print("Creating flat for %s" % filter_)
         for name, bias in [("flat_debiased_%s" % filter_, master_bias)]:
@@ -253,6 +261,9 @@ if __name__ == '__main__':
                              bias=master_bias,
                              flat=master_flats,
                              gain_corrected=True,
-                             dark_exposure_time=None)
-            print("Writing science")
-            write_collection(cc, outdir="OUT/%s" % format_filename(object_))
+                             dark_exposure_time=None, CRR=args.CRR)
+            if len(cc[1]) == 0: continue
+
+            print("Writing science: %s" % object_)
+            write_collection(cc, outdir="OUT/%s_%s" % (format_filename(object_),
+                                                       filter_))
