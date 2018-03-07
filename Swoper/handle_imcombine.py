@@ -22,14 +22,16 @@ if __name__ == '__main__':
         first = None
         reprojected = []
         for img, fname in ic.ccds(return_fname=True):
-            print(fname)
             if first is None:
                 first = img
                 print("New")
                 reprojected.append(first)
+                os.system("cp %s rp_%s" % (fname, fname))
                 continue
 
-            new = wcs_project(img, first.wcs, order="nearest-neighbor")
+            print(fname)
+
+            new = wcs_project(img, first.wcs) #, order="nearest-neighbor")
             try: new.write("rp_%s" % fname)
             except OSError: continue
             reprojected.append(new)
