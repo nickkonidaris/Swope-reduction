@@ -4,6 +4,7 @@ numpy
 pylab
 astropy
 ccdproc
+progressbar
 pyregion
 reproject
 
