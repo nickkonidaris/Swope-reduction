@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--glob", default="*.fits", help="glob to include")
+    parser.add_argument("--glob", default="ccd*.fits", help="glob to include")
     parser.add_argument("--radius", default="1", help="Radius to search around")
     parser.add_argument("--downsample", default="1", help="Number of pixels to \
                         downsample the image by.")
@@ -34,11 +34,23 @@ if __name__ == '__main__':
         hdr = astropy.io.fits.getheader(file_)
         ra = hdr["RA"]
         dec = hdr["DEC"]
-        cmd = "solve-field %s --index-xyls none --axy none --corr none \
-            --match none --rdls none --wcs none \
-            --skip-solved --overwrite --ra %s --dec %s \
+        exptype = hdr["EXPTYPE"]
+        name = hdr["OBJECT"]
+
+        if exptype != "Object":
+            print("%s | exposure type: %s skipped." % (file_, exptype))
+            continue
+
+        if "bias" in name:
+            print("%s | seems to be bias. skipped." % file_)
+            continue
+
+
+        cmd = "solve-field %s --index-xyls %s.xyls --temp-axy --corr %s.corr \
+            --match %s.match --rdls %s.rdls --wcs %s.wcs \
+            --skip-solved --solved %s.solved --ra %s --dec %s --cpulimit 10 \
             --radius %s --downsample %s --dir %s --new-fits wcs_%s" % \
-            (file_, ra, dec, radius, downsample, out, file_)
+            (file_, file_, file_, file_, file_, file_, file_, ra, dec, radius, downsample, out, file_)
         print(file_, ra, dec)
 
         os.system(cmd)
