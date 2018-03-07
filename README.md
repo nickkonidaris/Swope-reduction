@@ -18,13 +18,26 @@ change into the top-level directory
 install using  
     `pip install .`
 
+
 Dependencies
 ------------
  * Python 3.5
 
 Example usage
 -------------
-May not be needed
+
+* cd to the path `cd /Users/npk/.../ut180209_10` that contains Swope data
+* `mkdir OUT`
+* Handle bias, overscan, dark, and flat `python ~/Dropbox/REPOS/Swope-reduction/Swoper/handle_bodf.py` 
+* Go to the target of interest `cd OUT/TARGETNAME/`
+* `mkdir extractions` 
+* Run astrometry.net on the files `python ~/Dropbox/REPOS/Swope-reduction/Swoper/handle_astrometry.py`
+* Regrid everything to a common grid `python ~/Dropbox/REPOS/Swope-reduction/Swoper/handle_imcombine.py`
+* Check output `ds9 c1_stack.fits`
+* Run source extractor on everything `~/Dropbox/REPOS/Swope-reduction/bin/extall`
+* `cd extractions`
+* Combine catalogs `python ~/Dropbox/REPOS/Swope-reduction/Swoper/handle_catmerge.py`
+
 
 Contribution guide
 ------------------
