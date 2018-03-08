@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+mkdir extractions
+python ~/Dropbox/REPOS/Swope-reduction/Swoper/handle_astrometry.py
+python ~/Dropbox/REPOS/Swope-reduction/Swoper/handle_imcombine.py
+~/Dropbox/REPOS/Swope-reduction/bin/extall
+cd extractions
+python ~/Dropbox/REPOS/Swope-reduction/Swoper/handle_catmerge.py
+
