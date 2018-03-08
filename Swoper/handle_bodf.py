@@ -8,6 +8,7 @@ See LICENSE for details
 
 import argparse
 import astropy
+import astropy.io.fits
 import ccdproc
 
 import os
@@ -222,36 +223,53 @@ if __name__ == '__main__':
     if args.verbose:
         print(ic.summary)
 
-    print("Creating bias")
-    predicate = {"EXPTYPE": "Bias", "BINNING": "1x1"}
-    cc = collect_set(ic, predicate, ".")
-    print("Combining bias")
-    master_bias = combine_collection(cc, diagnostic=True)
-    write_comb(master_bias, name="bias")
-    pl.savefig("OUT/noise.pdf")
+    if True:
+        print("Creating bias")
+        predicate = {"EXPTYPE": "Bias", "BINNING": "1x1"}
+        cc = collect_set(ic, predicate, ".")
+        print("Combining bias")
+        master_bias = combine_collection(cc, diagnostic=True)
+        write_comb(master_bias, name="bias")
+        pl.savefig("OUT/noise.pdf")
+    else:
+        master_bias = {}
+        for i in range(1,5):
+            HDU = astropy.io.fits.open("OUT/bias_%i.fits" % i)
+            master_bias[i] = astropy.nddata.CCDData(HDU[0].data,
+                                                    unit=u.electron)
 
-    print("Creating darks")
-    predicate = {"EXPTYPE": "Dark", "BINNING": "1x1", "EXPTIME": 150.0}
-    cc = collect_set(ic, predicate, ".", bias=master_bias, gain_corrected=True)
-    print("Combining darks")
-    master_darks = combine_collection(cc)
-    write_comb(master_darks, name="dark")
+    if True:
+        print("Creating darks")
+        predicate = {"EXPTYPE": "Dark", "BINNING": "1x1", "EXPTIME": 150.0}
+        cc = collect_set(ic, predicate, ".", bias=master_bias, gain_corrected=True)
+        print("Combining darks")
+        master_darks = combine_collection(cc)
+        write_comb(master_darks, name="dark")
 
     for filter_ in set(ic.values("filter")):
         predicate = {"EXPTYPE": "Flat", "FILTER": filter_, "BINNING": "1x1",
                      "OBJECT": args.flatname}
 
-        print("Creating flat for %s" % filter_)
-        for name, bias in [("flat_debiased_%s" % filter_, master_bias)]:
-            cc = collect_set(ic, predicate, ".", bias=master_bias,
-                             gain_corrected=True)
-            print("Combining flats")
-            master_flats = combine_collection(cc)
-            write_comb(master_flats, name=name)
+        if True:
+            print("Creating flat for %s" % filter_)
+            for name, bias in [("flat_debiased_%s" % filter_, master_bias)]:
+                cc = collect_set(ic, predicate, ".", bias=master_bias,
+                                 gain_corrected=True)
+                print("Combining flats")
+                master_flats = combine_collection(cc)
+                write_comb(master_flats, name=name)
+        else:
+            master_flats = {}
+            for i in range(1,5):
+                HDU = astropy.io.fits.open("OUT/flat_debiased_r_%i.fits" % i)
+                master_flats[i] = astropy.nddata.CCDData(HDU[0].data,
+                                                    unit=u.electron)
 
         for object_ in set(ic.values("object")):
-            if type(object_) is not str:
-                object_ = "undefined"
+            print(object_)
+            #if (type(object_) is not str) or (type(object_) is not np.str_):
+            #    object_ = "undefined"
+
             predicate = {"EXPTYPE": "Object", "FILTER": filter_,
                          "BINNING": "1x1", "OBJECT": object_,
                          "NAXIS1": 2176, "NAXIS2": 2184}
