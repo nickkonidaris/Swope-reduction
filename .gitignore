@@ -5,4 +5,5 @@ doc/build/*
 *ropeproject*
 *ipynb_checkpoints*
 hide.py
+report.txt
 *.swo
